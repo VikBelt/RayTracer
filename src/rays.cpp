@@ -45,10 +45,14 @@ namespace RayTracer {
     double Vector::z(){
         return array[2];
     }
-
-    //function to return vector magnitude
+ 
+    //function to return vector magnitude & squared magnitude
     double Vector::magnitude(){
         return std::sqrt((array[0]*array[0]) + (array[1]*array[1]) + (array[2]*array[2]));
+    }
+
+    double Vector::magSquared(){
+        return ((array[0]*array[0]) + (array[1]*array[1]) + (array[2]*array[2]));
     }
 
     //dot (scalar) product
@@ -140,8 +144,15 @@ namespace RayTracer {
         return m_origin;
     }
 
+    Point Ray::origin() const {
+        return m_origin;
+    }
     //get the direction vector
     Vector Ray::direction() { 
+        return m_direction;
+    }
+
+    Vector Ray::direction() const {
         return m_direction;
     }
 
@@ -149,6 +160,10 @@ namespace RayTracer {
         return m_origin + m_direction*t;
     }
 
+    Point Ray::position(double t) const {
+        return m_origin + m_direction*t;
+    }
+    
     //function for color gradient
     Color rayColor(Ray& scene) {
         //check hitSphere discriminant
@@ -172,11 +187,12 @@ namespace RayTracer {
         Vector B = ray.m_direction;
         // want at^2 + bt+ c
         double a = dot(B,B);
-        double b = 2.0 * dot(B,A-C);
+        double half_b = dot(B,A-C);
         double c = dot(A-C,A-C) - (radius*radius);
         //do discriminant check
-        double discriminant = b*b - 4*a*c;
+        double discriminant = half_b*half_b - a*c;
         if(discriminant < 0) { return -1.0; }
-        else { return (-b - std::sqrt(discriminant))/(2.0*a); }
+        else { return (-half_b - std::sqrt(discriminant))/a; }
     }
+
 } //namespace RayTracer
