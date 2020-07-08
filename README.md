@@ -1,2 +1,2 @@
 # RayTracer
-A Raytracer in modern C++
+A raytracer in modern C++
