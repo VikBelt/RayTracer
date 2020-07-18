@@ -1,11 +1,10 @@
 #include <iostream>
+
+#include "helper.h"
+#include "shapes.h"
 #include "rays.h"
 
 using namespace RayTracer;
-
-constexpr double aspect_ratio {16.0/9.0};
-constexpr int image_width {1200};
-constexpr int image_height = static_cast<int>(image_width/aspect_ratio);
 
 int main() {
    
@@ -33,6 +32,6 @@ int main() {
 
         }
     }
-    
+
     return 0;
 }
