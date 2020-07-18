@@ -1,6 +1,6 @@
 #pragma once
 #include <iostream>
-#include <cmath>
+#include "helper.h"
 
 using std::sqrt;
 
@@ -20,8 +20,9 @@ namespace RayTracer {
         double y();
         double z();
         double magnitude();
+        double magSquared();
 
-        //utility functions
+        //friend functions
         friend std::ostream& operator<<(std::ostream&, const Vector&);
         friend Vector operator+(const Vector&, const Vector&);
         friend Vector operator-(const Vector&, const Vector&);
@@ -30,6 +31,7 @@ namespace RayTracer {
         friend Vector operator*(const double, const Vector&); //commutative
         friend Vector operator/(const Vector&, const double);
         friend double dot(const Vector&, const Vector&);
+        friend bool orthagonal(const Vector&, const Vector&);
         friend Vector cross(const Vector&, const Vector&);
         friend Vector unitVector(Vector&);
     };
@@ -47,8 +49,11 @@ namespace RayTracer {
         Ray();
         Ray(const Vector&, const Vector&);
         Point origin(); //get origin vector
+        Point origin() const;
         Vector direction(); //get direction vector
+        Vector direction() const;
         Point position(double t); //get the scale factor
+        Point position(double t) const;
         friend double hitSphere(const Point&,double,const Ray&);
     private:
         Point m_origin{0,0,0};
