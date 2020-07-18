@@ -1,9 +1,10 @@
 #include "rays.h"
 
 namespace RayTracer {
-    //Functions relating to Vector/Point/Color
-
+    /* Vector Class Methods 
     //Vector Constructor
+    */
+
     Vector::Vector(double x_in = 0, double y_in = 0, double z_in = 0) {
         array[0] = x_in;
         array[1] = y_in;
@@ -120,6 +121,15 @@ namespace RayTracer {
         return result;
     }
 
+    bool orthagonal(const Vector& vectorOne, const Vector& vectorTwo){
+        if(dot(vectorOne, vectorTwo) == 0){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
     Vector unitVector(Vector& source){
        return source/source.magnitude();
     }    
@@ -131,9 +141,10 @@ namespace RayTracer {
         << static_cast<int>(255.999 * pixel_color.z()) << '\n';
     }
 
+    /*
     //Ray Class Methods
+    //Constructors */
 
-    //Constructors
     Ray::Ray() {/*Empty Body*/}
 
     Ray::Ray(const Vector& orig, const Vector& direc) : m_origin{orig}, m_direction{direc} {
