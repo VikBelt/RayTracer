@@ -19,7 +19,10 @@ namespace RayTracer {
         double x();
         double y();
         double z();
+        static Vector randomVector();
+        static Vector randomVector(double,double);
         double magnitude();
+        double magnitude() const;
         double magSquared();
 
         //friend functions
@@ -33,15 +36,17 @@ namespace RayTracer {
         friend double dot(const Vector&, const Vector&);
         friend bool orthagonal(const Vector&, const Vector&);
         friend Vector cross(const Vector&, const Vector&);
-        friend Vector unitVector(Vector&);
+        friend Vector unitVector(const Vector&);
     };
     //vector Aliases
     using Point = Vector;
     using Color = Vector;
 
     //color utility function
-    void writeColor(std::ostream&,Color);
-
+    void writeColor(std::ostream&,Color,int);
+    Vector unitSphere();
+    Vector randomUnitVector(); //render method one
+    Vector inHemisphere(const Vector&);
     //Ray Class
     //represents r = r0 + vt - a vector equation
     class Ray {
@@ -54,12 +59,9 @@ namespace RayTracer {
         Vector direction() const;
         Point position(double t); //get the scale factor
         Point position(double t) const;
-        friend double hitSphere(const Point&,double,const Ray&);
     private:
         Point m_origin{0,0,0};
         Vector m_direction{0,0,0};
     };
 
-    //function to set ray color
-    Color rayColor(Ray&);
 } //namespace RayTracer
