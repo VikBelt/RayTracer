@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "helper.h"
 #include "shapes.h"
+#include "camera.h"
 #include "rays.h"
 
 using namespace RayTracer;
@@ -9,27 +9,25 @@ using namespace RayTracer;
 int main() {
    
     std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
-
     //viewport setup
-    double viewportHeight = 2.0;
-    double viewportWidth = viewportHeight * aspect_ratio;
-    double focalLength = 1.0;
-    Point origin{0,0,0};
-    Vector horizontal {viewportWidth,0,0};
-    Vector vertical {0,viewportHeight,0};
-    Vector lower_left_corner = origin - horizontal/2 - vertical/2 - Vector{0, 0, focalLength};
+    ShapeList world;
+    world.addPointer(std::make_shared<Sphere>(Point(0,0,-1), 0.5));
+    world.addPointer(std::make_shared<Sphere>(Point(0,-100.5,-1), 100));
+    unique_ptr<Camera> viewer(new Camera);
     //loop for rows
-    for (int j = image_height-1; j >= 0; --j) {
+    for (auto j = image_height-1; j >= 0; --j) {
         std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
         //loop for pixels
-        for (int i = 0; i < image_width; ++i) {
-            double u = double(i) / (image_width-1);
-            double v = double(j) / (image_height-1);
-            // setup a color gradient
-            Ray scene(origin, lower_left_corner + u*horizontal + v*vertical - origin);
-            Color pixelColor = rayColor(scene);
-            writeColor(std::cout, pixelColor);
-
+        for (auto i = 0; i < image_width; i++) {
+            //loop for pixel samples (within a pixel)
+            Color pixelColor {0,0,0};
+            for (auto s = 0; s < 100; ++s ){
+                double u = (i + randomDecimal())/ (image_width-1);
+                double v = (j + randomDecimal()) / (image_height-1);
+                Ray rayIn = viewer->sendRay(u,v);
+                pixelColor +=  rayColor(rayIn,world,maxDepth);
+            }
+            writeColor(std::cout, pixelColor, pixelSamples);
         }
     }
 
