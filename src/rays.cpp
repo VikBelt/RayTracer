@@ -34,6 +34,16 @@ namespace RayTracer {
         array[1] += source.array[1];
         array[2] += source.array[2];
     }
+
+    //Random Vector 
+    Vector Vector::randomVector(){
+        return (randomDecimal(),randomDecimal(),randomDecimal());
+    }
+
+    Vector Vector::randomVector(double min, double max){
+        return (randomDecimal(min,max),randomDecimal(min,max),randomDecimal(min,max));
+    }
+
     // Vector getter functions
     double Vector::x() {
         return array[0];
@@ -49,6 +59,10 @@ namespace RayTracer {
  
     //function to return vector magnitude & squared magnitude
     double Vector::magnitude(){
+        return std::sqrt((array[0]*array[0]) + (array[1]*array[1]) + (array[2]*array[2]));
+    }
+    
+    double Vector::magnitude() const{
         return std::sqrt((array[0]*array[0]) + (array[1]*array[1]) + (array[2]*array[2]));
     }
 
@@ -130,17 +144,53 @@ namespace RayTracer {
         }
     }
 
-    Vector unitVector(Vector& source){
+    Vector unitVector(const Vector& source){
        return source/source.magnitude();
     }    
 
     //Color Utility function
-    void writeColor(std::ostream& out, Color pixel_color) {
-    out << static_cast<int>(255.999 * pixel_color.x()) << ' '
-        << static_cast<int>(255.999 * pixel_color.y()) << ' '
-        << static_cast<int>(255.999 * pixel_color.z()) << '\n';
+    void writeColor(std::ostream& os, Color pixelColor, int samples) {
+
+        double r = pixelColor.x();
+        double g = pixelColor.y();
+        double b = pixelColor.z();
+        //update color samlpes
+        auto scaleFactor = 1.0/samples;
+        r =  std::sqrt(r * scaleFactor);
+        g = std::sqrt(g * scaleFactor);
+        b  = std::sqrt(b * scaleFactor);
+
+        os << static_cast<int>(256 * clipRange(r,0,0.999)) << ' '
+            << static_cast<int>(256 * clipRange(g,0,0.999)) << ' '
+            << static_cast<int>(256 * clipRange(b,0,0.999   )) << '\n';
     }
 
+    Vector unitSphere(){
+        while(true){
+            Vector test =  Vector::randomVector(-1,1);
+            if(test.magSquared() >= 1) {continue;} 
+            return test;
+        }
+    }
+
+    //method one
+    Vector randomUnitVector(){
+        double theta = randomDecimal(0,2*pi);
+        double len = randomDecimal(-1,1);
+        double rad = std::sqrt(1-len*len);
+        return Vector(rad*std::cos(theta),rad*std::sin(theta),len);
+    }
+
+    //method two
+    Vector inHemisphere(const Vector& normal){
+        Vector inSphere {unitSphere()};
+        if(dot(normal,inSphere) > 0) {
+            return inSphere;
+        }
+        else{
+            return -1*inSphere;
+        }
+    }
     /*
     //Ray Class Methods
     //Constructors */
@@ -175,35 +225,4 @@ namespace RayTracer {
         return m_origin + m_direction*t;
     }
     
-    //function for color gradient
-    Color rayColor(Ray& scene) {
-        //check hitSphere discriminant
-        double t = hitSphere(Point{0,0,-1},0.5,scene);
-        if(t > 0){
-            Vector temp = scene.position(t);
-            temp = temp - Vector{0,0,-1};
-            Vector N = unitVector(temp);
-            return 0.5* Color{N.x()+1, N.y()+1, N.z()+1};
-        }
-
-        Vector scene_direction = scene.direction();
-        Vector unit_direction = unitVector(scene_direction);
-        t = 0.5*(unit_direction.y() + 1.0);
-        return (1.0-t)*Color(1.0, 1.0, 1.0) + t*Color(0.5, 0.7, 1.0);
-    }
-
-    //hit Sphere - here is essentially a quadratic eqauation
-    double hitSphere(const Point& C, double radius, const Ray& ray) {
-        Point A = ray.m_origin;
-        Vector B = ray.m_direction;
-        // want at^2 + bt+ c
-        double a = dot(B,B);
-        double half_b = dot(B,A-C);
-        double c = dot(A-C,A-C) - (radius*radius);
-        //do discriminant check
-        double discriminant = half_b*half_b - a*c;
-        if(discriminant < 0) { return -1.0; }
-        else { return (-half_b - std::sqrt(discriminant))/a; }
-    }
-
 } //namespace RayTracer
