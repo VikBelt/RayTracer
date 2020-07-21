@@ -1,5 +1,4 @@
-\#pragma once
-#include "helper.h"
+#pragma once
 #include "rays.h"
 
 namespace RayTracer {
@@ -24,10 +23,11 @@ namespace RayTracer {
     public:
         ShapeList();
         ShapeList(shared_ptr<Shape>);
-        //virtual bool rayHit(const Ray&, double, double, HitRecord&);
+        virtual bool rayHit(const Ray&, double, double, HitRecord&) const override;
         void addPointer(shared_ptr<Shape>);
         void removePointer();
         void clearPointers();
+
     private:
         vector<shared_ptr<Shape>> pointerList;
     };
@@ -38,9 +38,12 @@ namespace RayTracer {
         virtual bool rayHit(const Ray&,double, double,HitRecord&) const override;
         double radius() const;
         Point center() const;
+
     private:
         Point m_center{0,0,0};
         double m_radius{};
     };
 
+     //function to set ray color
+    Color rayColor(const Ray&, const Shape&, int);
 } // namespace RayTracer
