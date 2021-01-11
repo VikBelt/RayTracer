@@ -1,14 +1,13 @@
 
-#include <iostream>
+#include "objects/Sphere.h"
+#include "objects/GeoObjectList.h"
+#include "utility/helper.h"
 #include "utility/Vector3D.h"
 #include "utility/Point3D.h"
 #include "utility/Ray.h"
 #include "utility/RGBPixel.h"
 
-using vrt::RGBPixel;
-using vrt::Vector3D;
-using vrt::Point3D;
-using vrt::Ray;
+using namespace vrt;
 
 int main() {
 
@@ -16,6 +15,13 @@ int main() {
     const int width = 400;
     const double aspectRatio = 16.0/9.0;
     const int height = static_cast<int>(width / aspectRatio);
+
+    //World Setup
+    GeoObjectList world;
+    //small sphere at the center of xy-plane
+    world.addObject(make_shared<Sphere>(Point3D(0,0,-1),0.5));
+    //large sphere at the lower part of the image
+    world.addObject(make_shared<Sphere>(Point3D(0,-100.5,-1),100));
 
     //Camera Setup
     double viewportHeight = 2.0;
@@ -37,7 +43,7 @@ int main() {
             Vector3D  newVec(lowerLeftCorner.x,lowerLeftCorner.y,lowerLeftCorner.z);
             Vector3D originVec(origin.x,origin.y,origin.z);
             Ray newRay(origin, newVec + u*horizontal + v*vertical - originVec);
-            RGBPixel pixel = vrt::rayColor(newRay);
+            RGBPixel pixel = vrt::rayColor(newRay,world);
             std::cout<<pixel<<std::endl;
         }
     }

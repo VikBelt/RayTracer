@@ -36,6 +36,7 @@ namespace vrt {
         double magSquared();
         double magSquared() const;
         Point3D toPoint();
+        Point3D toPoint() const;
     private:
         double* coordinates;
     };
@@ -161,6 +162,10 @@ namespace vrt {
     }
 
     Point3D Vector3D::toPoint(){
+        return Point3D(getX(),getY(),getZ());
+    }
+
+    Point3D Vector3D::toPoint() const {
         return Point3D(getX(),getY(),getZ());
     }
 

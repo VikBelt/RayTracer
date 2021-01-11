@@ -4,6 +4,9 @@
 #include "Vector3D.h"
 #include "Point3D.h"
 #include "RGBPixel.h"
+#include "../objects/GeoObject.h"
+
+
 
 namespace vrt{
 
@@ -16,6 +19,7 @@ namespace vrt{
         Point3D getOriginPoint() const;
         Vector3D getDirectionVector() const;
         Point3D getPoint(double time);
+        Point3D getPoint(double time) const;
     private:
         Point3D origin_;
         Vector3D direction_;
@@ -48,11 +52,9 @@ namespace vrt{
         return result;
     }
 
-    inline RGBPixel rayColor(const Ray& ray) {
-        Vector3D unitDirection = unitVector(ray.getDirectionVector());
-        double t = 0.5 * (unitDirection.getY() + 1.0);
-        RGBPixel blendedColor = (1.0-t)*RGBPixel(1.0, 1.0, 1.0) + t*RGBPixel(0.5, 0.7, 1.0);
-        return blendedColor;
+    Point3D Ray::getPoint(double time) const {
+        Point3D result = origin_ + time * direction_.toPoint();
+        return result;
     }
 
 } // namespace vrt
