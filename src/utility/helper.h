@@ -8,6 +8,9 @@
 
 namespace vrt {
 
+    constexpr int pixelSamples = 100;
+    constexpr int maxDepth = 50;
+
     //contant for pi
     constexpr double PI = 3.1415926535;
 
@@ -23,13 +26,18 @@ namespace vrt {
     }
 
     inline double randomDouble() {
-        return std::rand()/(RAND_MAX + 1.0);
+        return std::rand() / (RAND_MAX + 1.0);
     }
-    
+
     inline double randomDouble (double min, double max) {
          return min + (max-min)*randomDouble();
     }
 
+    inline double clamp (double x, double min, double max) {
+        if(x < min) return min;
+        if(x > max) return max;
+        return x;
+    }
 }
 
 #endif

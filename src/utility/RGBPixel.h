@@ -1,6 +1,7 @@
 #ifndef VRT_RGBPIXEL_H
 #define VRT_RGBPIXEL_H
 
+#include "helper.h"
 #include <iostream>
 #include <cmath>
 
@@ -77,9 +78,19 @@ namespace vrt {
     }
 
     inline std::ostream& operator<< (std::ostream& os, const RGBPixel& pixel) {
-        os << static_cast<int>(255.999 * pixel.r) << " "
-        << static_cast<int>(255.999 * pixel.g) << " "
-        << static_cast<int>(255.999 * pixel.b);
+        double r = pixel.r;
+        double g = pixel.g;
+        double b = pixel.b;
+
+        // Divide the color by the number of samples.
+        double scale = 1.0 / pixelSamples;
+        r = std::sqrt(scale*r);
+        g = std::sqrt(scale*g);
+        b = std::sqrt(scale*b);
+
+        os  << static_cast<int>(256 * clamp(r, 0.0, 0.999)) << " "
+            << static_cast<int>(256 * clamp(g, 0.0, 0.999)) << " "
+            << static_cast<int>(256 * clamp(b, 0.0, 0.999));
         return os;
     }
 

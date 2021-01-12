@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <iostream>
+#include "helper.h"
 #include "Point3D.h"
 
 namespace vrt {
@@ -35,8 +36,12 @@ namespace vrt {
         double magnitude() const;
         double magSquared();
         double magSquared() const;
+        bool nearZero() const;
         Point3D toPoint();
         Point3D toPoint() const;
+        //random vector
+        static Vector3D randomVector();
+        static Vector3D randomVector(double min, double max);
     private:
         double* coordinates;
     };
@@ -161,12 +166,27 @@ namespace vrt {
         return coordinates[0]*coordinates[0] + coordinates[1]*coordinates[1] + coordinates[2]*coordinates[2];
     }
 
+    bool Vector3D::nearZero() const {
+        // Return true if the vector is close to zero in all dimensions.
+        const auto s = 1e-8; 
+        return (fabs(coordinates[0]) < s) && (fabs(coordinates[1]) < s) && (fabs(coordinates[2]) < s);
+    }
+
     Point3D Vector3D::toPoint(){
         return Point3D(getX(),getY(),getZ());
     }
 
     Point3D Vector3D::toPoint() const {
         return Point3D(getX(),getY(),getZ());
+    }
+
+    //static class methods
+    Vector3D Vector3D::randomVector(){
+        return Vector3D(randomDouble(),randomDouble(),randomDouble());
+    }
+
+    Vector3D Vector3D::randomVector(double min, double max) {
+        return Vector3D(randomDouble(min,max),randomDouble(min,max),randomDouble(min,max));
     }
 
     //utility functions
@@ -221,6 +241,26 @@ namespace vrt {
     inline std::ostream& operator<<(std::ostream& os, const Vector3D& vector) {
         os << vector.getX() << " " << vector.getY() << " " << vector.getZ();
         return os;
+    }
+
+    Vector3D randInUnitSphere() {
+        //find a random vector within this range
+        while(true) {
+            Vector3D vec = Vector3D::randomVector(-1,1);
+            if(vec.magSquared() >= 1) {
+                continue;
+            }
+            return vec;
+        }
+    }
+
+    Vector3D randUnitVector() {
+        return unitVector(randInUnitSphere());
+    }
+
+    Vector3D vectorReflection(const Vector3D& v, const Vector3D& n){
+        Vector3D newVec = v - 2*dotProduct(v,n)*n;
+        return newVec;
     }
 
 } //namespace vrt

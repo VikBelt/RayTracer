@@ -8,7 +8,7 @@ namespace vrt {
     class Sphere : public GeoObject {
     public:
         Sphere();
-        Sphere(Point3D cen, double rad);
+        Sphere(Point3D cen, double rad, std::shared_ptr<Material> mat);
         Point3D getCenter();
         double getRadius();
         bool hit(const Ray& ray, double t_min, double t_max, HitRec& record) const override;
@@ -16,6 +16,7 @@ namespace vrt {
         //sphere params
         double radius_;
         Point3D center_;
+        std::shared_ptr<Material> material_;
     };
 
     //class Methods
@@ -25,7 +26,9 @@ namespace vrt {
         center_ = Point3D(0,0,-1);
     }
 
-    Sphere::Sphere(const Point3D cen,double rad) : center_{cen}, radius_{rad} {
+    Sphere::Sphere(const Point3D cen, double rad, std::shared_ptr<Material> mat) 
+        : center_{cen}, radius_{rad}, material_{mat} 
+    {
         //Empty Ctor Body
     }
 
@@ -69,6 +72,7 @@ namespace vrt {
         Point3D temp = (record.point_ - center_) / radius_; 
         Vector3D outwardNormal = Vector3D(temp.x, temp.y, temp.z);
         record.setFaceNormal(ray,outwardNormal);
+        record.material_ = material_;
 
         return true;   
     }
