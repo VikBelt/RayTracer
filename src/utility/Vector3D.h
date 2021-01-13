@@ -263,6 +263,16 @@ namespace vrt {
         return newVec;
     }
 
+    Vector3D vectorRefraction(const Vector3D& uv, const Vector3D& n, double etaRatio) {
+        //function for implementing refraction 
+        // cos_theta = a dot b
+        double cos = std::fmin(dotProduct(-uv, n), 1.0);
+        Vector3D perpVec = etaRatio * (uv + (cos * n));
+        Vector3D parVec = -std::sqrt(std::fabs(1.0 - perpVec.magSquared())) * n;
+        //return sum of paralel and perpendicular vector - that is, the refracted ray
+        return parVec + perpVec;
+    }
+
 } //namespace vrt
 
 #endif

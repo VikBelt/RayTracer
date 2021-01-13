@@ -6,44 +6,45 @@
 #include "utility/Point3D.h"
 #include "utility/Ray.h"
 #include "utility/RGBPixel.h"
+#include "world/Camera.h"
+#include "materials/Lambertian.h"
+#include "materials/Dielectric.h"
+#include "materials/Metal.h"
 
 using namespace vrt;
 
-int main() {
 
-    //Image Setup
-    const int width = 400;
-    const double aspectRatio = 16.0/9.0;
-    const int height = static_cast<int>(width / aspectRatio);
+int main() {
 
     //World Setup
     GeoObjectList world;
-    //small sphere at the center of xy-plane
-    world.addObject(make_shared<Sphere>(Point3D(0,0,-1),0.5));
-    //large sphere at the lower part of the image
-    world.addObject(make_shared<Sphere>(Point3D(0,-100.5,-1),100));
 
+    std::shared_ptr<Material> material_ground = make_shared<Lambertian>(RGBPixel(0.8, 0.8, 0.0));
+    std::shared_ptr<Material> material_left = make_shared<Dielectric>(1.5);
+    std::shared_ptr<Material> material_center = make_shared<Lambertian>(RGBPixel(0.1, 0.2, 0.5));
+    std::shared_ptr<Material> material_right = make_shared<Metal>(RGBPixel(0.8, 0.6, 0.2),0.0);
+
+    world.addObject(make_shared<Sphere>(Point3D( 0.0, -100.5, -1.0), 100.0, material_ground));
+    world.addObject(make_shared<Sphere>(Point3D( 0.0, 0.0, -1.0), 0.5, material_center));
+    world.addObject(make_shared<Sphere>(Point3D(-1.0, 0.0, -1.0), 0.5, material_left));
+    world.addObject(make_shared<Sphere>(Point3D(-1.0, 0.0, -1.0), -0.4, material_left));
+    world.addObject(make_shared<Sphere>(Point3D( 1.0, 0.0, -1.0), 0.5, material_right));
     //Camera Setup
-    double viewportHeight = 2.0;
-    double viewportWidth = aspectRatio * viewportHeight;
-    double focalLength = 1.0;
-    Point3D origin = Point3D(0, 0, 0);
-    Vector3D horizontal = Vector3D(viewportWidth, 0, 0);
-    Vector3D vertical = Vector3D(0, viewportHeight, 0);
-    Point3D lowerLeftCorner = origin - horizontal.toPoint()/2 - vertical.toPoint()/2 - Vector3D(0, 0, focalLength).toPoint();
+    Camera cam;
 
-    std::cout << "P3\n" << width << ' ' << height << "\n255\n";
+    std::cout << "P3\n" << imageWidth << ' ' << imageHeight << "\n255\n";
     //Image Renderng
-    for(int j = height-1; j >= 0; j--){
+    for(int j = imageHeight-1; j >= 0; j--){
         std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
-        for(int i = 0; i < width; i++) {
-            //create a color and output it
-            double u = static_cast<double>(i)/(width-1);
-            double v = static_cast<double>(j)/(height-1);
-            Vector3D  newVec(lowerLeftCorner.x,lowerLeftCorner.y,lowerLeftCorner.z);
-            Vector3D originVec(origin.x,origin.y,origin.z);
-            Ray newRay(origin, newVec + u*horizontal + v*vertical - originVec);
-            RGBPixel pixel = vrt::rayColor(newRay,world);
+        for(int i = 0; i < imageWidth; i++) {
+            RGBPixel pixel(0,0,0);  //default (0,0,0)
+            for(int s = 0; s < pixelSamples; ++s) {
+                double u = (i + randomDouble()) / (imageWidth-1);
+                double v = (j + randomDouble()) / (imageHeight-1);
+                const Ray& r = cam.getRay(u, v);
+                pixel += rayColor(r, world, maxDepth);
+            }
+            //write the pixel
             std::cout<<pixel<<std::endl;
         }
     }

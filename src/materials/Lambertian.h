@@ -21,7 +21,8 @@ namespace vrt {
         //Empty Body
     }
 
-    bool Lambertian::scatteredRay(const Ray& in, const HitRec& record, RGBPixel& attenuation, Ray& scattered) const
+    bool Lambertian::scatteredRay(const Ray& in, const HitRec& record, 
+        RGBPixel& attenuation, Ray& scattered) const
     {
         Vector3D scatterDirection = record.normal_ + randUnitVector();
         
