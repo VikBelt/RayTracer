@@ -254,6 +254,14 @@ namespace vrt {
         }
     }
 
+    Vector3D randomInUnitDisk() {
+        while (true) {
+            auto p = Vector3D(randomDouble(-1,1), randomDouble(-1,1), 0);
+            if (p.magSquared() >= 1) continue;
+            return p;
+        }
+    }
+
     Vector3D randUnitVector() {
         return unitVector(randInUnitSphere());
     }

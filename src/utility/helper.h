@@ -8,7 +8,7 @@
 
 namespace vrt {
 
-    constexpr int pixelSamples = 100;
+    constexpr int pixelSamples = 500;
     constexpr int maxDepth = 50;
 
     //contant for pi

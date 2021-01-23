@@ -15,6 +15,9 @@ namespace vrt {
         bool operator!= (const RGBPixel& other);
         RGBPixel& operator+=(const RGBPixel& other);
         RGBPixel& operator*=(const RGBPixel& other);
+        //static methods
+        static RGBPixel randomColor();
+        static RGBPixel randomColor(double min, double max);    
         double r; 
         double g;
         double b;
@@ -92,6 +95,16 @@ namespace vrt {
             << static_cast<int>(256 * clamp(g, 0.0, 0.999)) << " "
             << static_cast<int>(256 * clamp(b, 0.0, 0.999));
         return os;
+    }
+
+    //static methods
+    RGBPixel RGBPixel::randomColor() {
+        return RGBPixel(randomDouble(),randomDouble(),randomDouble());
+    }
+
+    //static methods
+    RGBPixel RGBPixel::randomColor(double min, double max) {
+        return RGBPixel(randomDouble(min,max),randomDouble(min,max),randomDouble(min,max));
     }
 
 } //namespace vrt

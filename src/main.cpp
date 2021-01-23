@@ -1,36 +1,17 @@
-
-#include "objects/Sphere.h"
-#include "objects/GeoObjectList.h"
-#include "utility/helper.h"
-#include "utility/Vector3D.h"
-#include "utility/Point3D.h"
-#include "utility/Ray.h"
-#include "utility/RGBPixel.h"
-#include "world/Camera.h"
-#include "materials/Lambertian.h"
-#include "materials/Dielectric.h"
-#include "materials/Metal.h"
-
-using namespace vrt;
-
+#include "Raytracer.h"
 
 int main() {
 
     //World Setup
-    GeoObjectList world;
+    GeoObjectList world = randomScene();
 
-    std::shared_ptr<Material> material_ground = make_shared<Lambertian>(RGBPixel(0.8, 0.8, 0.0));
-    std::shared_ptr<Material> material_left = make_shared<Dielectric>(1.5);
-    std::shared_ptr<Material> material_center = make_shared<Lambertian>(RGBPixel(0.1, 0.2, 0.5));
-    std::shared_ptr<Material> material_right = make_shared<Metal>(RGBPixel(0.8, 0.6, 0.2),0.0);
+    Point3D lookFrom(13,2,3);
+    Point3D lookAt(0,0,0);
+    Vector3D viewUp(0,1,0);
+    double focusDist = 10.0;
+    double aperture = 0.1;
 
-    world.addObject(make_shared<Sphere>(Point3D( 0.0, -100.5, -1.0), 100.0, material_ground));
-    world.addObject(make_shared<Sphere>(Point3D( 0.0, 0.0, -1.0), 0.5, material_center));
-    world.addObject(make_shared<Sphere>(Point3D(-1.0, 0.0, -1.0), 0.5, material_left));
-    world.addObject(make_shared<Sphere>(Point3D(-1.0, 0.0, -1.0), -0.4, material_left));
-    world.addObject(make_shared<Sphere>(Point3D( 1.0, 0.0, -1.0), 0.5, material_right));
-    //Camera Setup
-    Camera cam;
+    Camera cam(lookFrom, lookAt, viewUp, 20, aspectRatio, aperture,focusDist);
 
     std::cout << "P3\n" << imageWidth << ' ' << imageHeight << "\n255\n";
     //Image Renderng

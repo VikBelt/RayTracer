@@ -10,18 +10,14 @@
 namespace vrt {
 
     //Image Size information 
-    constexpr int imageWidth = 600;
-    constexpr double aspectRatio = 16.0/9.0;
+    constexpr int imageWidth = 1200;
+    constexpr double aspectRatio = 3.0/2.0;
     constexpr int imageHeight = static_cast<int>(imageWidth / aspectRatio);
     
-    //Camera Size Information
-    constexpr double viewportHeight = 2.0;
-    constexpr double viewportWidth = aspectRatio * viewportHeight;
-    constexpr double focalLength = 1.0;
-
     class Camera {
     public:
-        Camera();
+        Camera(Point3D lookFrom, Point3D lookAt, Vector3D veiwUp, double vfov, 
+            double aspect_ratio, double apperature, double focusDistance);
         //getter methods
         Point3D getOrigin();
         Point3D getOrigin() const;
@@ -32,20 +28,36 @@ namespace vrt {
         Vector3D getVertical(); 
         Vector3D getVertical() const;
         //get ray 
-        Ray getRay(double u, double v) const;
+        Ray getRay(double s, double t) const;
     private:
         //viewport dimensions
         Point3D origin_;
         Point3D lowerLeft_;
         Vector3D horizontal_;
         Vector3D vertical_;
+        Vector3D u, v, w;
+        double lensRadius;
     };
 
-    Camera::Camera() {
-        origin_ = Point3D(0,0,0);
-        horizontal_ = Vector3D(viewportWidth, 0, 0);
-        vertical_ = Vector3D(0.0, viewportHeight, 0.0);
-        lowerLeft_ =  origin_ - horizontal_.toPoint()/2 - vertical_.toPoint()/2 - Vector3D(0, 0, focalLength).toPoint();
+    Camera::Camera (Point3D lookFrom, Point3D lookAt, Vector3D veiwUp, double vfov, 
+        double aspect_ratio, double aperture, double focusDistance) {
+        //camera setup
+        double theta = radians(vfov);
+        double h = std::tan(theta/2);
+        //Camera Size Information   
+        double viewportHeight = 2.0 * h;
+        double viewportWidth = aspect_ratio * viewportHeight;
+        
+        w = unitVector(Vector3D((lookFrom.x - lookAt.x),(lookFrom.y - lookAt.y),(lookFrom.z - lookAt.z)));
+        u = unitVector(crossProduct(veiwUp,w));
+        v = crossProduct(w,u);
+
+        origin_ = lookFrom;
+        horizontal_ = focusDistance * viewportWidth * u;
+        vertical_ = focusDistance * viewportHeight * v;
+        lowerLeft_ =  origin_ - horizontal_.toPoint()/2 - vertical_.toPoint()/2 - focusDistance * w.toPoint();
+
+        lensRadius = aperture / 2;
     }
 
     Point3D Camera::getOrigin() {
@@ -80,12 +92,13 @@ namespace vrt {
         return vertical_;
     }
 
-    Ray Camera::getRay(double u, double v) const {
+    Ray Camera::getRay(double s, double t) const {
         //helper methods
-        Vector3D  lowLeft(lowerLeft_.x,lowerLeft_.y,lowerLeft_.z);
-        Vector3D originVec(origin_.x,origin_.y,origin_.z);
-        Ray newRay(origin_, lowLeft + u*horizontal_ + v*vertical_ - originVec);
-        return newRay;
+        Vector3D rd = lensRadius * randomInUnitDisk();
+        Vector3D offset = u * rd.getX() + v * rd.getY();
+        Vector3D lowLeft(lowerLeft_.x, lowerLeft_.y, lowerLeft_.z);
+        Vector3D originVec(origin_.x, origin_.y, origin_.z);
+        return Ray(origin_ + offset.toPoint(), lowLeft + s*horizontal_ + t*vertical_ - originVec - offset);
     }
 };
 
